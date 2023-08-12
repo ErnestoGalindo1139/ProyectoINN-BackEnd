@@ -135,6 +135,37 @@ app.post('/api/recomendacionmensaje', (req, res) => {
   });
 });
 
+// Ruta RecomendacionProtocolo
+app.get('/api/recomendacionprotocolo', (req, res) => {
+  const sqlQuery = 'SELECT * FROM RecomendacionProtocolo';
+
+  connection.query(sqlQuery, (error, results) => {
+    if (error) {
+      console.error('Error en la consulta SQL:', error);
+      res.status(500).json({ error: 'Error en la consulta SQL' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+app.post('/api/recomendacionprotocolo', (req, res) => {
+  const { RecoP_Protocolo } = req.body;
+
+  const sqlQuery = 'INSERT INTO RecomendacionProtocolo (RecoP_Protocolo) VALUES (?)';
+
+  const values = [RecoP_Protocolo]; // Solo los valores que se insertarán
+
+  connection.query(sqlQuery, values, (error, results) => {
+    if (error) {
+      console.error('Error al insertar en la base de datos:', error);
+      res.status(500).json({ error: 'Error al insertar en la base de datos' });
+    } else {
+      res.json({ message: 'Datos insertados correctamente' });
+    }
+  });
+});
+
 // Ruta raíz
 app.get('/', (req, res) => {
   res.send('Bienvenido a mi aplicación Express'); // Puedes cambiar el mensaje
