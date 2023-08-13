@@ -181,21 +181,6 @@ app.get('/api/datosclimaticos', (req, res) => {
   });
 });
 
-
-// Ruta para insertar datos climáticos
-app.get('/api/datosclimaticos', (req, res) => {
-  const sqlQuery = 'SELECT * FROM datosclimaticos';
-
-  connection.query(sqlQuery, (error, results) => {
-      if (error) {
-          console.error('Error en la consulta SQL:', error);
-          res.status(500).json({ error: 'Error en la consulta SQL' });
-      } else {
-          res.json(results);
-      }
-  });
-});
-
 // Ruta para insertar datos climáticos
 app.post('/api/datosclimaticos', (req, res) => {
   const {
@@ -234,6 +219,40 @@ app.post('/api/datosclimaticos', (req, res) => {
   });
 });
 
+// Ruta para obtener los datos de la tabla espaciodeportivodatosclimaticos
+app.get('/api/espaciodeportivodatosclimaticos', (req, res) => {
+  const sqlQuery = 'SELECT * FROM espaciodeportivodatosclimaticos';
+
+  connection.query(sqlQuery, (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          res.json(results);
+      }
+  });
+});
+
+// Ruta para insertar datos en la tabla espaciodeportivodatosclimaticos
+app.post('/api/espaciodeportivodatosclimaticos', (req, res) => {
+  const { EDDC_ED_Id, EDDC_DC_Id } = req.body;
+
+  const sqlQuery = 'INSERT INTO espaciodeportivodatosclimaticos (EDDC_ED_Id, EDDC_DC_Id) VALUES (?, ?)';
+
+  const values = [
+      EDDC_ED_Id,
+      EDDC_DC_Id
+  ];
+
+  connection.query(sqlQuery, values, (error, results) => {
+      if (error) {
+          console.error('Error al insertar en la base de datos:', error);
+          res.status(500).json({ error: 'Error al insertar en la base de datos' });
+      } else {
+          res.json({ message: 'Datos insertados correctamente' });
+      }
+  });
+});
 
 
 
