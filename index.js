@@ -56,6 +56,77 @@ app.get('/api/deporte', (req, res) => {
   });
 });
 
+// Consultar
+app.get('/api/deporte/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'SELECT * FROM deporte WHERE Depor_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          if (results.length > 0) {
+              res.json(results[0]);
+          } else {
+              res.status(404).json({ error: 'Datos no encontrados' });
+          }
+      }
+  });
+});
+
+// Modificar
+app.put('/api/deporte/:id', (req, res) => {
+  const Depor_Id = req.params.id;
+  const { Depor_Nombre } = req.body;
+
+  // Validación: Asegurarse de que todos los campos tengan valores
+  if (!Depor_Nombre) {
+    return res.status(400).json({ error: 'Todos los campos deben tener valores' });
+  }
+
+  // Verificar si el registro con el ID existe
+  const checkQuery = 'SELECT * FROM deporte WHERE Depor_Id = ?';
+  connection.query(checkQuery, [Depor_Id], (error, results) => {
+    if (error) {
+      console.error('Error en la consulta SQL:', error);
+      return res.status(500).json({ error: 'Error en la consulta SQL' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'El ID ingresado no existe en la base de datos' });
+    }
+
+    // Modificar el registro
+    const updateQuery = 'UPDATE deporte SET Depor_Nombre = ? WHERE Depor_Id = ?';
+    const values = [Depor_Nombre, Depor_Id];
+
+    connection.query(updateQuery, values, (error, results) => {
+      if (error) {
+        console.error('Error al modificar el registro:', error);
+        return res.status(500).json({ error: 'Error al modificar el registro en la base de datos' });
+      }
+
+      res.json({ message: 'Registro modificado correctamente' });
+    });
+  });
+});
+
+// Borrar
+app.delete('/api/deporte/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'DELETE FROM deporte WHERE Depor_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          res.json({ message: 'Registro eliminado correctamente' });
+      }
+  });
+});
+
 app.post('/api/deporte', (req, res) => {
   const { Depor_Nombre } = req.body;
 
@@ -180,6 +251,95 @@ app.get('/api/datosclimaticos', (req, res) => {
       }
   });
 });
+
+// Consultar
+app.get('/api/datosclimaticos/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'SELECT * FROM datosclimaticos WHERE DC_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          if (results.length > 0) {
+              res.json(results[0]);
+          } else {
+              res.status(404).json({ error: 'Datos no encontrados' });
+          }
+      }
+  });
+});
+
+// Modificar
+app.put('/api/datosclimaticos/:id', (req, res) => {
+  const DC_Id = req.params.id;
+  const {
+      idRecoM,
+      temperatura,
+      humedad,
+      nivelLluvia,
+      indiceUV,
+      idRecoPDC
+  } = req.body;
+
+  // Validación: Asegurarse de que todos los campos tengan valores
+  if (!idRecoM || !temperatura || !humedad || !nivelLluvia || !indiceUV || !idRecoPDC) {
+      return res.status(400).json({ error: 'Todos los campos deben tener valores' });
+  }
+
+  // Verificar si el registro con el ID existe
+  const checkQuery = 'SELECT * FROM datosclimaticos WHERE DC_Id = ?';
+  connection.query(checkQuery, [DC_Id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          return res.status(500).json({ error: 'Error en la consulta SQL' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ error: 'El ID ingresado no existe en la base de datos' });
+      }
+
+      // Modificar el registro
+      const updateQuery = 'UPDATE datosclimaticos SET DC_IdRecoM=?, DC_Temperatura=?, DC_Humedad=?, DC_NivelLluvia=?, DC_IndiceUV=?, DC_IdRecoP=? WHERE DC_Id=?';
+      const values = [
+          idRecoM,
+          temperatura,
+          humedad,
+          nivelLluvia,
+          indiceUV,
+          idRecoPDC,
+          DC_Id
+      ];
+
+      connection.query(updateQuery, values, (error, results) => {
+          if (error) {
+              console.error('Error al modificar el registro:', error);
+              return res.status(500).json({ error: 'Error al modificar el registro en la base de datos' });
+          }
+
+          res.json({ message: 'Registro modificado correctamente' });
+      });
+  });
+});
+
+
+// Borrar
+app.delete('/api/datosclimaticos/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'DELETE FROM datosclimaticos WHERE DC_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          res.json({ message: 'Registro eliminado correctamente' });
+      }
+  });
+});
+
+
 
 // Ruta para insertar datos climáticos
 app.post('/api/datosclimaticos', (req, res) => {
