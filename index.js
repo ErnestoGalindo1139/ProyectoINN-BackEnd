@@ -289,6 +289,41 @@ app.post('/api/espaciodeportivodeporte', (req, res) => {
   });
 });
 
+// Ruta para obtener los datos de la tabla espaciodeportivodatosclimaticos
+app.get('/api/usuarioespaciodeportivo', (req, res) => {
+  const sqlQuery = 'SELECT * FROM usuarioespaciodeportivo';
+
+  connection.query(sqlQuery, (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          res.json(results);
+      }
+  });
+});
+
+// Ruta para insertar datos en la tabla espaciodeportivodatosclimaticos
+app.post('/api/usuarioespaciodeportivo', (req, res) => {
+  const { UED_Uio_Id, UED_ED_Id } = req.body;
+
+  const sqlQuery = 'INSERT INTO usuarioespaciodeportivo (UED_Uio_Id, UED_ED_Id) VALUES (?, ?)';
+
+  const values = [
+    UED_Uio_Id,
+      UED_ED_Id
+  ];
+
+  connection.query(sqlQuery, values, (error, results) => {
+      if (error) {
+          console.error('Error al insertar en la base de datos:', error);
+          res.status(500).json({ error: 'Error al insertar en la base de datos' });
+      } else {
+          res.json({ message: 'Datos insertados correctamente' });
+      }
+  });
+});
+
 
 
 
