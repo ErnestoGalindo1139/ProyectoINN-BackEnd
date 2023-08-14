@@ -214,7 +214,7 @@ app.put('/api/espaciodeportivo/:id', (req, res) => {
   });
 });
 
-// Borrar
+//? Borrar
 app.delete('/api/espaciodeportivo/:id', (req, res) => {
   const id = req.params.id;
   const sqlQuery = 'DELETE FROM espaciodeportivo WHERE ED_Id = ?';
@@ -257,6 +257,77 @@ app.get('/api/recomendacionmensaje', (req, res) => {
     } else {
       res.json(results);
     }
+  });
+});
+
+//? Consultar
+app.get('/api/recomendacionmensaje/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'SELECT * FROM recomendacionmensaje WHERE RecoM_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          if (results.length > 0) {
+              res.json(results[0]);
+          } else {
+              res.status(404).json({ error: 'Datos no encontrados' });
+          }
+      }
+  });
+});
+
+//? Modificar
+app.put('/api/recomendacionmensaje/:id', (req, res) => {
+  const RecoM_Id = req.params.id;
+  const { RecoM_Mensaje } = req.body;
+
+  // Validación: Asegurarse de que todos los campos tengan valores
+  if (!RecoM_Mensaje) {
+    return res.status(400).json({ error: 'Todos los campos deben tener valores' });
+  }
+
+  // Verificar si el registro con el ID existe
+  const checkQuery = 'SELECT * FROM recomendacionmensaje WHERE RecoM_Id = ?';
+  connection.query(checkQuery, [RecoM_Id], (error, results) => {
+    if (error) {
+      console.error('Error en la consulta SQL:', error);
+      return res.status(500).json({ error: 'Error en la consulta SQL' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'El ID ingresado no existe en la base de datos' });
+    }
+
+    // Modificar el registro
+    const updateQuery = 'UPDATE recomendacionmensaje SET RecoM_Mensaje = ? WHERE RecoM_Id = ?';
+    const values = [RecoM_Mensaje, RecoM_Id];
+
+    connection.query(updateQuery, values, (error, results) => {
+      if (error) {
+        console.error('Error al modificar el registro:', error);
+        return res.status(500).json({ error: 'Error al modificar el registro en la base de datos' });
+      }
+
+      res.json({ message: 'Registro modificado correctamente' });
+    });
+  });
+});
+
+//? Borrar
+app.delete('/api/recomendacionmensaje/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'DELETE FROM recomendacionmensaje WHERE RecoM_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          res.json({ message: 'Registro eliminado correctamente' });
+      }
   });
 });
 
