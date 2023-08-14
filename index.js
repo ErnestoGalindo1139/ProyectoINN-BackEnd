@@ -973,6 +973,27 @@ app.post('/api/usuarioespaciodeportivo', (req, res) => {
   });
 });
 
+// Consultas por Mes
+app.get('/api/consultas', (req, res) => {
+  const query = `
+    SELECT DC_Id, DC_Fecha, DE_HoraRegistro, DC_Temperatura, DC_Humedad, DC_NivelLluvia, DC_IndiceUV, EDDC_ED_Id, ED_Nombre
+    FROM DatosClimaticos
+    JOIN EspacioDeportivoDatosClimaticos ON DatosClimaticos.DC_Id = EspacioDeportivoDatosClimaticos.EDDC_DC_Id
+    JOIN EspacioDeportivo ON EspacioDeportivoDatosClimaticos.EDDC_ED_Id = EspacioDeportivo.ED_Id
+    WHERE MONTH(DC_Fecha) = 7 AND YEAR(DC_Fecha) = 2023
+    ORDER BY DC_Fecha;
+  `;
+
+  connection.query(query, (error, results) => {
+    if (error) {
+      console.error('Error en la consulta SQL:', error);
+      return res.status(500).json({ error: 'Error en la consulta SQL' });
+    }
+
+    res.json(results);
+  });
+});
+
 
 
 
