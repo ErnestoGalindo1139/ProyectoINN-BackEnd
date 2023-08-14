@@ -883,6 +883,75 @@ app.get('/api/usuarioespaciodeportivo', (req, res) => {
   });
 });
 
+// Consultar
+app.get('/api/usuarioespaciodeportivo/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'SELECT * FROM usuarioespaciodeportivo WHERE UED_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          if (results.length > 0) {
+              res.json(results[0]);
+          } else {
+              res.status(404).json({ error: 'Datos no encontrados' });
+          }
+      }
+  });
+});
+
+// Modificar
+app.put('/api/usuarioespaciodeportivo/:id', (req, res) => {
+  const UED_Id = req.params.id;
+  const { UED_Uio_Id, UED_ED_Id } = req.body;
+
+  if (!UED_Uio_Id || !UED_ED_Id) {
+      return res.status(400).json({ error: 'Todos los campos deben tener valores' });
+  }
+
+  const checkQuery = 'SELECT * FROM usuarioespaciodeportivo WHERE UED_Id = ?';
+  connection.query(checkQuery, [UED_Id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          return res.status(500).json({ error: 'Error en la consulta SQL' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ error: 'El ID ingresado no existe en la base de datos' });
+      }
+
+      const updateQuery = 'UPDATE usuarioespaciodeportivo SET UED_Uio_Id = ?, UED_ED_Id = ? WHERE UED_Id = ?';
+
+      const values = [UED_Uio_Id, UED_ED_Id, UED_Id];
+
+      connection.query(updateQuery, values, (error, results) => {
+          if (error) {
+              console.error('Error al modificar el registro:', error);
+              return res.status(500).json({ error: 'Error al modificar el registro en la base de datos' });
+          }
+
+          res.json({ message: 'Registro modificado correctamente' });
+      });
+  });
+});
+
+// Borrar
+app.delete('/api/usuarioespaciodeportivo/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'DELETE FROM usuarioespaciodeportivo WHERE UED_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          res.json({ message: 'Registro eliminado correctamente' });
+      }
+  });
+});
+
 // Ruta para insertar datos en la tabla espaciodeportivodatosclimaticos
 app.post('/api/usuarioespaciodeportivo', (req, res) => {
   const { UED_Uio_Id, UED_ED_Id } = req.body;
