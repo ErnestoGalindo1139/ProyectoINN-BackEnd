@@ -24,6 +24,76 @@ app.get('/api/usuario', (req, res) => {
   });
 });
 
+// Consultar
+app.get('/api/usuario/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'SELECT * FROM usuario WHERE Uio_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          if (results.length > 0) {
+              res.json(results[0]);
+          } else {
+              res.status(404).json({ error: 'Datos no encontrados' });
+          }
+      }
+  });
+});
+
+// Modificar
+app.put('/api/usuario/:id', (req, res) => {
+  const Uio_Id = req.params.id;
+  const { Uio_Nombre, Uio_Correo, Uio_Contrasena } = req.body;
+
+  if (!Uio_Nombre || !Uio_Correo || !Uio_Contrasena) {
+      return res.status(400).json({ error: 'Todos los campos deben tener valores' });
+  }
+
+  const checkQuery = 'SELECT * FROM usuario WHERE Uio_Id = ?';
+  connection.query(checkQuery, [Uio_Id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          return res.status(500).json({ error: 'Error en la consulta SQL' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ error: 'El ID ingresado no existe en la base de datos' });
+      }
+
+      const updateQuery = 'UPDATE usuario SET Uio_Nombre = ?, Uio_Correo = ?, Uio_Contrasena = ? WHERE Uio_Id = ?';
+
+      const values = [Uio_Nombre, Uio_Correo, Uio_Contrasena, Uio_Id];
+
+      connection.query(updateQuery, values, (error, results) => {
+          if (error) {
+              console.error('Error al modificar el registro:', error);
+              return res.status(500).json({ error: 'Error al modificar el registro en la base de datos' });
+          }
+
+          res.json({ message: 'Registro modificado correctamente' });
+      });
+  });
+});
+
+
+// Borrar
+app.delete('/api/usuario/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'DELETE FROM usuario WHERE Uio_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          res.json({ message: 'Registro eliminado correctamente' });
+      }
+  });
+});
+
 app.post('/api/usuario', (req, res) => {
   const { Uio_Nombre, Uio_Correo, Uio_Contrasena } = req.body;
 
