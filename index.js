@@ -567,6 +567,75 @@ app.get('/api/espaciodeportivodeporte', (req, res) => {
   });
 });
 
+// Consultar
+app.get('/api/espaciodeportivodeporte/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'SELECT * FROM espaciodeportivodeporte WHERE EDDepor_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          if (results.length > 0) {
+              res.json(results[0]);
+          } else {
+              res.status(404).json({ error: 'Datos no encontrados' });
+          }
+      }
+  });
+});
+
+// Modificar
+app.put('/api/espaciodeportivodeporte/:id', (req, res) => {
+  const EDDepor_Id = req.params.id;
+  const { EDDepor_ED_Id, EDDepor_Depor_Id } = req.body;
+
+  if (!EDDepor_ED_Id || !EDDepor_Depor_Id) {
+      return res.status(400).json({ error: 'Todos los campos deben tener valores' });
+  }
+
+  const checkQuery = 'SELECT * FROM espaciodeportivodeporte WHERE EDDepor_Id = ?';
+  connection.query(checkQuery, [EDDepor_Id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          return res.status(500).json({ error: 'Error en la consulta SQL' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ error: 'El ID ingresado no existe en la base de datos' });
+      }
+
+      const updateQuery = 'UPDATE espaciodeportivodeporte SET EDDepor_ED_Id = ?, EDDepor_Depor_Id = ? WHERE EDDepor_Id = ?';
+
+      const values = [EDDepor_ED_Id, EDDepor_Depor_Id, EDDepor_Id];
+
+      connection.query(updateQuery, values, (error, results) => {
+          if (error) {
+              console.error('Error al modificar el registro:', error);
+              return res.status(500).json({ error: 'Error al modificar el registro en la base de datos' });
+          }
+
+          res.json({ message: 'Registro modificado correctamente' });
+      });
+  });
+});
+
+// Borrar
+app.delete('/api/espaciodeportivodeporte/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'DELETE FROM espaciodeportivodeporte WHERE EDDepor_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          res.json({ message: 'Registro eliminado correctamente' });
+      }
+  });
+});
+
 // Ruta para insertar datos en la tabla espaciodeportivodatosclimaticos
 app.post('/api/espaciodeportivodeporte', (req, res) => {
   const { EDDepor_ED_Id, EDDepor_Depor_Id } = req.body;
