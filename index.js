@@ -348,7 +348,7 @@ app.post('/api/recomendacionmensaje', (req, res) => {
   });
 });
 
-// Ruta RecomendacionProtocolo
+//! Ruta RecomendacionProtocolo
 app.get('/api/recomendacionprotocolo', (req, res) => {
   const sqlQuery = 'SELECT * FROM RecomendacionProtocolo';
 
@@ -359,6 +359,77 @@ app.get('/api/recomendacionprotocolo', (req, res) => {
     } else {
       res.json(results);
     }
+  });
+});
+
+//? Consultar
+app.get('/api/recomendacionprotocolo/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'SELECT * FROM RecomendacionProtocolo WHERE RecoP_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          if (results.length > 0) {
+              res.json(results[0]);
+          } else {
+              res.status(404).json({ error: 'Datos no encontrados' });
+          }
+      }
+  });
+});
+
+//? Modificar
+app.put('/api/recomendacionprotocolo/:id', (req, res) => {
+  const RecoP_Id = req.params.id;
+  const { RecoP_Protocolo } = req.body;
+
+  // Validación: Asegurarse de que todos los campos tengan valores
+  if (!RecoP_Protocolo) {
+    return res.status(400).json({ error: 'Todos los campos deben tener valores' });
+  }
+
+  // Verificar si el registro con el ID existe
+  const checkQuery = 'SELECT * FROM RecomendacionProtocolo WHERE RecoP_Id = ?';
+  connection.query(checkQuery, [RecoP_Id], (error, results) => {
+    if (error) {
+      console.error('Error en la consulta SQL:', error);
+      return res.status(500).json({ error: 'Error en la consulta SQL' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'El ID ingresado no existe en la base de datos' });
+    }
+
+    // Modificar el registro
+    const updateQuery = 'UPDATE RecomendacionProtocolo SET RecoP_Protocolo = ? WHERE RecoP_Id = ?';
+    const values = [RecoP_Protocolo, RecoP_Id];
+
+    connection.query(updateQuery, values, (error, results) => {
+      if (error) {
+        console.error('Error al modificar el registro:', error);
+        return res.status(500).json({ error: 'Error al modificar el registro en la base de datos' });
+      }
+
+      res.json({ message: 'Registro modificado correctamente' });
+    });
+  });
+});
+
+//? Borrar
+app.delete('/api/recomendacionprotocolo/:id', (req, res) => {
+  const id = req.params.id;
+  const sqlQuery = 'DELETE FROM RecomendacionProtocolo WHERE RecoP_Id = ?';
+
+  connection.query(sqlQuery, [id], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          res.status(500).json({ error: 'Error en la consulta SQL' });
+      } else {
+          res.json({ message: 'Registro eliminado correctamente' });
+      }
   });
 });
 
