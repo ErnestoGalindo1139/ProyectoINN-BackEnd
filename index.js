@@ -991,11 +991,9 @@ app.get('/api/consultaMes', (req, res) => {
       console.error('Error en la consulta SQL:', error);
       return res.status(500).json({ error: 'Error en la consulta SQL' });
     }
-
     res.json(results);
   });
 });
-
 
 // Consultas por Espacio Deportivo
 app.get('/api/consulta-espacio', (req, res) => {
