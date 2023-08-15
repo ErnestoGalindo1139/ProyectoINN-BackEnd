@@ -978,11 +978,11 @@ app.get('/api/consultaMes', (req, res) => {
   const { mes, anio } = req.query;
 
   const query = `
-    SELECT DC_Id AS 'ID', DC_Fecha AS 'Fecha', DE_HoraRegistro AS 'Hora Registro', DC_Temperatura AS 'Temperatura', DC_Humedad AS 'Humedad', DC_NivelLluvia AS 'Nivel de Lluvia', DC_IndiceUV AS 'Índice UV', EDDC_ED_Id AS 'ID ED', ED_Nombre AS 'Espacio Deportivo'
+    SELECT DC_Id, DC_Fecha, DE_HoraRegistro, DC_Temperatura, DC_Humedad, DC_NivelLluvia, DC_IndiceUV, EDDC_ED_Id, ED_Nombre
     FROM DatosClimaticos
     JOIN EspacioDeportivoDatosClimaticos ON DatosClimaticos.DC_Id = EspacioDeportivoDatosClimaticos.EDDC_DC_Id
     JOIN EspacioDeportivo ON EspacioDeportivoDatosClimaticos.EDDC_ED_Id = EspacioDeportivo.ED_Id
-    WHERE MONTH(DC_Fecha) = 7 AND YEAR(DC_Fecha) = 2023
+    WHERE MONTH(DC_Fecha) = ? AND YEAR(DC_Fecha) = ?
     ORDER BY DC_Fecha;
   `;
 
@@ -995,6 +995,7 @@ app.get('/api/consultaMes', (req, res) => {
     res.json(results);
   });
 });
+
 
 // Consultas por Espacio Deportivo
 app.get('/api/consulta-espacio', (req, res) => {
