@@ -996,6 +996,33 @@ app.get('/api/consultaMes', (req, res) => {
   });
 });
 
+// Consultas por Espacio Deportivo
+app.get('/api/consulta-espacio', (req, res) => {
+  const selectedEspacioDeportivo = req.query.espacio;
+
+  if (!selectedEspacioDeportivo) {
+      return res.status(400).json({ error: 'Por favor, seleccione un Espacio Deportivo.' });
+  }
+
+  const consulta = `
+      SELECT EspacioDeportivo.ED_Nombre, DatosClimaticos.DC_Id, DatosClimaticos.DC_Fecha, DatosClimaticos.DE_HoraRegistro,
+        DatosClimaticos.DC_Temperatura, DatosClimaticos.DC_Humedad, DatosClimaticos.DC_NivelLluvia, DatosClimaticos.DC_IndiceUV
+      FROM EspacioDeportivo
+      JOIN EspacioDeportivoDatosClimaticos ON EspacioDeportivo.ED_Id = EspacioDeportivoDatosClimaticos.EDDC_ED_Id
+      JOIN DatosClimaticos ON EspacioDeportivoDatosClimaticos.EDDC_DC_Id = DatosClimaticos.DC_Id
+      WHERE EspacioDeportivo.ED_Nombre = ?
+      ORDER BY DatosClimaticos.DC_Fecha;
+  `;
+
+  connection.query(consulta, [selectedEspacioDeportivo], (error, results) => {
+      if (error) {
+          console.error('Error en la consulta SQL:', error);
+          return res.status(500).json({ error: 'Error en la consulta SQL' });
+      }
+
+      res.json(results);
+  });
+});
 
 
 
