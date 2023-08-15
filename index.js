@@ -974,9 +974,11 @@ app.post('/api/usuarioespaciodeportivo', (req, res) => {
 });
 
 // Consultas por Mes
-app.get('/api/consultas', (req, res) => {
+app.get('/api/consultaMes', (req, res) => {
+  const { mes, anio } = req.query;
+
   const query = `
-    SELECT DC_Id, DC_Fecha, DE_HoraRegistro, DC_Temperatura, DC_Humedad, DC_NivelLluvia, DC_IndiceUV, EDDC_ED_Id, ED_Nombre
+    SELECT DC_Id AS 'ID', DC_Fecha AS 'Fecha', DE_HoraRegistro AS 'Hora Registro', DC_Temperatura AS 'Temperatura', DC_Humedad AS 'Humedad', DC_NivelLluvia AS 'Nivel de Lluvia', DC_IndiceUV AS 'Índice UV', EDDC_ED_Id AS 'ID ED', ED_Nombre AS 'Espacio Deportivo'
     FROM DatosClimaticos
     JOIN EspacioDeportivoDatosClimaticos ON DatosClimaticos.DC_Id = EspacioDeportivoDatosClimaticos.EDDC_DC_Id
     JOIN EspacioDeportivo ON EspacioDeportivoDatosClimaticos.EDDC_ED_Id = EspacioDeportivo.ED_Id
@@ -984,7 +986,7 @@ app.get('/api/consultas', (req, res) => {
     ORDER BY DC_Fecha;
   `;
 
-  connection.query(query, (error, results) => {
+  connection.query(query, [mes, anio], (error, results) => {
     if (error) {
       console.error('Error en la consulta SQL:', error);
       return res.status(500).json({ error: 'Error en la consulta SQL' });
@@ -993,6 +995,7 @@ app.get('/api/consultas', (req, res) => {
     res.json(results);
   });
 });
+
 
 
 
